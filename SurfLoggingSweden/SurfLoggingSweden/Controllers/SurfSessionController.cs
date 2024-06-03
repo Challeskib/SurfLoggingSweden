@@ -18,7 +18,7 @@ public class SurfSessionController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<SurfSession>>> GetSurfSessions()
+    public async Task<ActionResult<List<SurfSession>>> GetSurfSessionsAsync()
     {
         return await _context.SurfSessions.ToListAsync();
     }

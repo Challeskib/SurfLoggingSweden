@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using SurfLoggingSweden.Client;
+
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 

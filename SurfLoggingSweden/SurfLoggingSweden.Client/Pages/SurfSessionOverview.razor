@@ -1,14 +1,14 @@
 ﻿@page "/surfsessions"
 @inject HttpClient Http
-@rendermode InteractiveWebAssembly
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 
-<h3>SurfSessionOverview</h3>
+<h3>Surf Session Overview</h3>
 
 <PageTitle>Surf Sessions</PageTitle>
 
 <p>This component demonstrates showing data.</p>
 
-@if (surfSessions.Count == null)
+@if (surfSessions == null || surfSessions.Count == 0)
 {
     <p><em>Loading...</em></p>
 }
@@ -20,17 +20,17 @@ else
                 <th>Date</th>
                 <th>Wind Degree</th>
                 <th>Rating</th>
-                <th>WindPower</th>
+                <th>Wind Power</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var surfSession in surfSessions)
             {
                 <tr>
-                    <td>@surfSessions.Start.ToShortDateString()</td>
-                    <td>@surfSessions.WindDegree</td>
-                    <td>@surfSessions.Rating</td>
-                    <td>@surfSessions.WindPower</td>
+                    <td>@surfSession.Start</td>
+                    <td>@surfSession.WindDegree</td>
+                    <td>@surfSession.Rating</td>
+                    <td>@surfSession.WindPower</td>
                 </tr>
             }
         </tbody>
@@ -38,17 +38,19 @@ else
 }
 
 @code {
-    List<SurfSession> surfSessions = new List<SurfSession>();
+    private List<SurfSession> surfSessions;
 
-     protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        try
+        await Task.Delay(500);
+
+        var result = await Http.GetFromJsonAsync<List<SurfSession>>("api/surfsessions");
+
+        if (result is not null)
         {
-            surfSessions = await Http.GetFromJsonAsync<List<SurfSession>>("api/surfsessions");
+            surfSessions = result;
+
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error fetching surf sessions: {ex.Message}");
-        }
+
     }
 }

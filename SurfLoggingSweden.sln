@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SurfLoggingSweden", "SurfLo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SurfLoggingSweden.Client", "SurfLoggingSweden\SurfLoggingSweden.Client\SurfLoggingSweden.Client.csproj", "{FD59F737-A84C-4175-A747-8FD3B9D82243}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SurfLoggingSweden.Shared", "SurfLoggingSweden.Shared\SurfLoggingSweden.Shared.csproj", "{C68D59E2-A867-4185-8BD1-F9411D329593}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SurfLoggingSweden.Shared", "SurfLoggingSweden.Shared\SurfLoggingSweden.Shared.csproj", "{C68D59E2-A867-4185-8BD1-F9411D329593}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
