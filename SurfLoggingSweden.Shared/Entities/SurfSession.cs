@@ -1,4 +1,4 @@
-﻿namespace SurfLoggingSweden.Entities
+﻿namespace SurfLoggingSweden.Shared.Entities
 {
     public class SurfSession
     {

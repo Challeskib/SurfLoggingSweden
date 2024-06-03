@@ -9,7 +9,27 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Pages\SurfSessionOverview.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Pages\SurfSessionOverview.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\SurfSessionOverview.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Pages\SurfSessionOverview.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\SurfLoggingSweden.Shared\SurfLoggingSweden.Shared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SurfLoggingSweden.Data;
-using SurfLoggingSweden.Entities;
+using SurfLoggingSweden.Shared.Entities;
 
 namespace SurfLoggingSweden.Controllers;
 

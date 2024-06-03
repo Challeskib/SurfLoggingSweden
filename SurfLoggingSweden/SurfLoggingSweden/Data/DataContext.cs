@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SurfLoggingSweden.Entities;
+using SurfLoggingSweden.Shared.Entities;
 
 namespace SurfLoggingSweden.Data
 {

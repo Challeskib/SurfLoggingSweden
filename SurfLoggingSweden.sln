@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.34916.146
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SurfLoggingSweden", "SurfLoggingSweden\SurfLoggingSweden\SurfLoggingSweden.csproj", "{A8CA2191-9FD4-4759-A11A-213DA1A23EB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SurfLoggingSweden", "SurfLoggingSweden\SurfLoggingSweden\SurfLoggingSweden.csproj", "{A8CA2191-9FD4-4759-A11A-213DA1A23EB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SurfLoggingSweden.Client", "SurfLoggingSweden\SurfLoggingSweden.Client\SurfLoggingSweden.Client.csproj", "{FD59F737-A84C-4175-A747-8FD3B9D82243}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SurfLoggingSweden.Client", "SurfLoggingSweden\SurfLoggingSweden.Client\SurfLoggingSweden.Client.csproj", "{FD59F737-A84C-4175-A747-8FD3B9D82243}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SurfLoggingSweden.Shared", "SurfLoggingSweden.Shared\SurfLoggingSweden.Shared.csproj", "{C68D59E2-A867-4185-8BD1-F9411D329593}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{FD59F737-A84C-4175-A747-8FD3B9D82243}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD59F737-A84C-4175-A747-8FD3B9D82243}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD59F737-A84C-4175-A747-8FD3B9D82243}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C68D59E2-A867-4185-8BD1-F9411D329593}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C68D59E2-A867-4185-8BD1-F9411D329593}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C68D59E2-A867-4185-8BD1-F9411D329593}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C68D59E2-A867-4185-8BD1-F9411D329593}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
