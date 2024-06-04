@@ -5,40 +5,73 @@
 
 <h3>Add New Surf Session</h3>
 
-<EditForm Model="newSession" OnValidSubmit="HandleValidSubmit">
+<EditForm Model="newSession" OnValidSubmit="HandleValidSubmit" class="form-horizontal">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    <ValidationSummary class="alert alert-danger" />
 
-    <div>
-        <label for="surfSpotId">Surf Spot ID:</label>
-        <InputNumber id="surfSpotId" @bind-Value="newSession.SurfSpotId" />
-    </div>
-    <div>
-        <label for="windDegree">Wind Degree:</label>
-        <InputNumber id="windDegree" @bind-Value="newSession.WindDegree" />
-    </div>
-    <div>
-        <label for="rating">Rating:</label>
-        <InputNumber id="rating" @bind-Value="newSession.Rating" />
-    </div>
-    <div>
-        <label for="windPower">Wind Power:</label>
-        <InputNumber id="windPower" @bind-Value="newSession.WindPower" />
-    </div>
-    <div>
-        <label for="start">Start:</label>
-        <InputDate id="start" @bind-Value="newSession.Start" />
-    </div>
-    <div>
-        <label for="end">End:</label>
-        <InputDate id="end" @bind-Value="newSession.End" />
+    <div class="form-group row">
+        <label for="surfSpotId" class="col-sm-2 col-form-label">Surf Spot:</label>
+        <div class="col-sm-10">
+            <InputSelect id="surfSpotId" @bind-Value="newSession.SurfSpotId" class="form-control">
+                <option value="">Select a Surf Spot</option>
+                @foreach (var spot in surfSpots)
+                {
+                    <option value="@spot.Id">@spot.Name</option>
+                }
+            </InputSelect>
+        </div>
     </div>
 
-    <button type="submit">Submit</button>
+    <div class="form-group row">
+        <label for="windDegree" class="col-sm-2 col-form-label">Wind Degree:</label>
+        <div class="col-sm-10">
+            <InputNumber id="windDegree" @bind-Value="newSession.WindDegree" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="rating" class="col-sm-2 col-form-label">Rating:</label>
+        <div class="col-sm-10">
+            <InputNumber id="rating" @bind-Value="newSession.Rating" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="windPower" class="col-sm-2 col-form-label">Wind Power:</label>
+        <div class="col-sm-10">
+            <InputNumber id="windPower" @bind-Value="newSession.WindPower" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="start" class="col-sm-2 col-form-label">Start:</label>
+        <div class="col-sm-10">
+            <InputDate id="start" @bind-Value="newSession.Start" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="end" class="col-sm-2 col-form-label">End:</label>
+        <div class="col-sm-10">
+            <InputDate id="end" @bind-Value="newSession.End" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-sm-10 offset-sm-2">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
 </EditForm>
 
 @code {
     private SurfSession newSession = new SurfSession();
+    private List<SurfSpot> surfSpots;
+
+    protected override async Task OnInitializedAsync()
+    {
+        surfSpots = await Http.GetFromJsonAsync<List<SurfSpot>>("api/surfspots");
+    }
 
     private async Task HandleValidSubmit()
     {
