@@ -25,16 +25,65 @@ else
                 <th>Wind Degree</th>
                 <th>Rating</th>
                 <th>Wind Power</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var surfSession in surfSessions)
             {
                 <tr>
-                    <td>@surfSession.Start</td>
-                    <td>@surfSession.WindDegree</td>
-                    <td>@surfSession.Rating</td>
-                    <td>@surfSession.WindPower</td>
+                    <td>
+                        @if (editIndex == surfSessions.IndexOf(surfSession))
+                        {
+                            <InputDate @bind-Value="surfSession.Start" class="form-control" />
+                        }
+                        else
+                        {
+                            @surfSession.Start.ToShortDateString()
+                        }
+                    </td>
+                    <td>
+                        @if (editIndex == surfSessions.IndexOf(surfSession))
+                        {
+                            <InputNumber @bind-Value="surfSession.WindDegree" class="form-control" />
+                        }
+                        else
+                        {
+                            @surfSession.WindDegree
+                        }
+                    </td>
+                    <td>
+                        @if (editIndex == surfSessions.IndexOf(surfSession))
+                        {
+                            <InputNumber @bind-Value="surfSession.Rating" class="form-control" />
+                        }
+                        else
+                        {
+                            @surfSession.Rating
+                        }
+                    </td>
+                    <td>
+                        @if (editIndex == surfSessions.IndexOf(surfSession))
+                        {
+                            <InputNumber @bind-Value="surfSession.WindPower" class="form-control" />
+                        }
+                        else
+                        {
+                            @surfSession.WindPower
+                        }
+                    </td>
+                    <td>
+                        @if (editIndex == surfSessions.IndexOf(surfSession))
+                        {
+                            <button class="btn btn-success" @onclick="() => SaveEdit(surfSession)">Save</button>
+                            <button class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" @onclick="() => EditSession(surfSessions.IndexOf(surfSession))">Edit</button>
+                            <button class="btn btn-danger" @onclick="() => DeleteSession(surfSession.Id)">Delete</button>
+                        }
+                    </td>
                 </tr>
             }
         </tbody>
@@ -43,21 +92,38 @@ else
 
 @code {
     private List<SurfSession> surfSessions;
+    private int editIndex = -1; // Index of the session being edited
 
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(500);
-
-        var result = await Http.GetFromJsonAsync<List<SurfSession>>("api/surfsessions");
-
-        if (result is not null)
-        {
-            surfSessions = result;
-        }
+        surfSessions = await Http.GetFromJsonAsync<List<SurfSession>>("api/surfsessions");
     }
 
     private void NavigateToAddSession()
     {
         Navigation.NavigateTo("/addsurfsession");
+    }
+
+    private void EditSession(int index)
+    {
+        editIndex = index;
+    }
+
+    private void CancelEdit()
+    {
+        editIndex = -1;
+    }
+
+    private async Task SaveEdit(SurfSession surfSession)
+    {
+        await Http.PutAsJsonAsync($"api/surfsessions/{surfSession.Id}", surfSession);
+        editIndex = -1;
+    }
+
+    private async Task DeleteSession(int id)
+    {
+        await Http.DeleteAsync($"api/surfsessions/{id}");
+        surfSessions = await Http.GetFromJsonAsync<List<SurfSession>>("api/surfsessions");
     }
 }

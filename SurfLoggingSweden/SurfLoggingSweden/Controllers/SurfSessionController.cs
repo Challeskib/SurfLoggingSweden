@@ -30,4 +30,54 @@ public class SurfSessionController : ControllerBase
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetSurfSessionsAsync), new { id = surfSession.Id }, surfSession);
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutSurfSession(int id, SurfSession surfSession)
+    {
+        if (id != surfSession.Id)
+        {
+            return BadRequest();
+        }
+
+        _context.Entry(surfSession).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!SurfSessionExists(id))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteSurfSession(int id)
+    {
+        var surfSession = await _context.SurfSessions.FindAsync(id);
+        if (surfSession == null)
+        {
+            return NotFound();
+        }
+
+        _context.SurfSessions.Remove(surfSession);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    private bool SurfSessionExists(int id)
+    {
+        return _context.SurfSessions.Any(e => e.Id == id);
+    }
+
 }
