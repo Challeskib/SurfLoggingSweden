@@ -1,0 +1,32 @@
+﻿@page "/addsurfspot"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+<h3>Add New Surf Spot</h3>
+
+<EditForm Model="newSpot" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label for="name">Name:</label>
+        <InputText id="name" @bind-Value="newSpot.Name" />
+    </div>
+    <div>
+        <label for="location">Location:</label>
+        <InputText id="location" @bind-Value="newSpot.Location" />
+    </div>
+
+    <button type="submit">Submit</button>
+</EditForm>
+
+@code {
+    private SurfSpot newSpot = new SurfSpot();
+
+    private async Task HandleValidSubmit()
+    {
+        await Http.PostAsJsonAsync("api/surfspots", newSpot);
+        Navigation.NavigateTo("/surfspots");
+    }
+}

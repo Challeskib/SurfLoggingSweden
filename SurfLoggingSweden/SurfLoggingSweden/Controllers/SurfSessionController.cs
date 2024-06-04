@@ -22,4 +22,12 @@ public class SurfSessionController : ControllerBase
     {
         return await _context.SurfSessions.ToListAsync();
     }
+
+    [HttpPost]
+    public async Task<ActionResult<SurfSession>> PostSurfSession(SurfSession surfSession)
+    {
+        _context.SurfSessions.Add(surfSession);
+        await _context.SaveChangesAsync();
+        return CreatedAtAction(nameof(GetSurfSessionsAsync), new { id = surfSession.Id }, surfSession);
+    }
 }

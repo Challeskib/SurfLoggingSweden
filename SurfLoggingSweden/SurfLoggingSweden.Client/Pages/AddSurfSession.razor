@@ -1,0 +1,48 @@
+﻿@page "/addsurfsession"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+<h3>Add New Surf Session</h3>
+
+<EditForm Model="newSession" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label for="surfSpotId">Surf Spot ID:</label>
+        <InputNumber id="surfSpotId" @bind-Value="newSession.SurfSpotId" />
+    </div>
+    <div>
+        <label for="windDegree">Wind Degree:</label>
+        <InputNumber id="windDegree" @bind-Value="newSession.WindDegree" />
+    </div>
+    <div>
+        <label for="rating">Rating:</label>
+        <InputNumber id="rating" @bind-Value="newSession.Rating" />
+    </div>
+    <div>
+        <label for="windPower">Wind Power:</label>
+        <InputNumber id="windPower" @bind-Value="newSession.WindPower" />
+    </div>
+    <div>
+        <label for="start">Start:</label>
+        <InputDate id="start" @bind-Value="newSession.Start" />
+    </div>
+    <div>
+        <label for="end">End:</label>
+        <InputDate id="end" @bind-Value="newSession.End" />
+    </div>
+
+    <button type="submit">Submit</button>
+</EditForm>
+
+@code {
+    private SurfSession newSession = new SurfSession();
+
+    private async Task HandleValidSubmit()
+    {
+        await Http.PostAsJsonAsync("api/surfsessions", newSession);
+        Navigation.NavigateTo("/surfsessions");
+    }
+}

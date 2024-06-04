@@ -1,0 +1,59 @@
+﻿@page "/surfspots"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+<h3>Surf Spot Overview</h3>
+
+<PageTitle>Surf Spots</PageTitle>
+
+<p>This component demonstrates showing data.</p>
+
+<button class="btn btn-primary" @onclick="NavigateToAddSpot">Add New Surf Spot</button>
+
+@if (surfSpots == null || surfSpots.Count == 0)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Location</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var surfSpot in surfSpots)
+            {
+                <tr>
+                    <td>@surfSpot.Name</td>
+                    <td>@surfSpot.Location</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<SurfSpot> surfSpots;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(500);
+
+        var result = await Http.GetFromJsonAsync<List<SurfSpot>>("api/surfspots");
+
+        if (result is not null)
+        {
+            surfSpots = result;
+        }
+    }
+
+    private void NavigateToAddSpot()
+    {
+        Navigation.NavigateTo("/addsurfspot");
+    }
+}
