@@ -12,13 +12,20 @@
     <div class="form-group row">
         <label for="surfSpotId" class="col-sm-2 col-form-label">Surf Spot:</label>
         <div class="col-sm-10">
-            <InputSelect id="surfSpotId" @bind-Value="newSession.SurfSpotId" class="form-control">
-                <option value="">Select a Surf Spot</option>
-                @foreach (var spot in surfSpots)
-                {
-                    <option value="@spot.Id">@spot.Name</option>
-                }
-            </InputSelect>
+            @if (surfSpots != null)
+            {
+                <InputSelect id="surfSpotId" @bind-Value="newSession.SurfSpotId" class="form-control">
+                    <option value="">Select a Surf Spot</option>
+                    @foreach (var spot in surfSpots)
+                    {
+                        <option value="@spot.Id">@spot.Name</option>
+                    }
+                </InputSelect>
+            }
+            else
+            {
+                <p><em>Loading...</em></p>
+            }
         </div>
     </div>
 

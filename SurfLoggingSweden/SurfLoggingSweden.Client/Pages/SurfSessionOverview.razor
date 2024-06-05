@@ -8,8 +8,6 @@
 
 <PageTitle>Surf Sessions</PageTitle>
 
-<p>This component demonstrates showing data.</p>
-
 <button class="btn btn-primary" @onclick="NavigateToAddSession">Add New Surf Session</button>
 
 @if (surfSessions == null || surfSessions.Count == 0)
@@ -52,7 +50,7 @@ else
                             @surfSession.WindDegree
                         }
                     </td>
-                    <td>
+                    <td style="background-color:@GetRatingColor(surfSession.Rating)">
                         @if (editIndex == surfSessions.IndexOf(surfSession))
                         {
                             <InputNumber @bind-Value="surfSession.Rating" class="form-control" />
@@ -62,7 +60,7 @@ else
                             @surfSession.Rating
                         }
                     </td>
-                    <td>
+                    <td style="background-color:@GetWindPowerColor(surfSession.WindPower)">
                         @if (editIndex == surfSessions.IndexOf(surfSession))
                         {
                             <InputNumber @bind-Value="surfSession.WindPower" class="form-control" />
@@ -125,5 +123,30 @@ else
     {
         await Http.DeleteAsync($"api/surfsessions/{id}");
         surfSessions = await Http.GetFromJsonAsync<List<SurfSession>>("api/surfsessions");
+    }
+
+    private string GetRatingColor(int rating)
+    {
+        return rating switch
+        {
+            1 => "#ffcccc", // Very light red
+            2 => "#ff9999", // Light red
+            3 => "#ffff99", // Light yellow
+            4 => "#99ff99", // Light green
+            5 => "#66ff66", // Very light green
+            _ => "#ffffff"  // Default white
+        };
+    }
+
+    private string GetWindPowerColor(int windPower)
+    {
+        return windPower switch
+        {
+            <= 5 => "#ccffff", // Very light blue
+            > 5 and <= 10 => "#99ccff", // Light blue
+            > 10 and <= 15 => "#3399ff", // Medium blue
+            > 15 and <= 25 => "#0066cc", // Dark blue
+            > 25 => "#003399", // Very dark blue
+        };
     }
 }

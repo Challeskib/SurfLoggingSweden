@@ -1,0 +1,124 @@
+﻿@page "/currentweather"
+@inject HttpClient Http
+
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+<h3>Surf Spot Weather Overview</h3>
+
+@if (surfSpots == null || surfSpots.Count == 0)
+{
+    <p><em>Loading surf spots...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Temperature (°C)</th>
+                <th>Wind Speed (m/s)</th>
+                <th>Condition</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var surfSpot in surfSpots)
+            {
+                <tr>
+                    <td>@surfSpot.Name</td>
+                    <td>@surfSpot.Location</td>
+                    <td>@(GetWeather(surfSpot.Location)?.current?.temp_c ?? "Loading...")</td>
+                    <td>@(GetWeather(surfSpot.Location)?.current?.wind_mph / 2.237 ?? "Loading...")</td>
+                    <td>
+                        @if (GetWeather(surfSpot.Location) != null)
+                        {
+                            <img src="@($"https:{GetWeather(surfSpot.Location).current.condition.icon}")" alt="Weather icon" />
+                            @GetWeather(surfSpot.Location).current.condition.text
+                        }
+                        else
+                        {
+                            <em>Loading...</em>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<SurfSpot> surfSpots;
+    private Dictionary<string, WeatherResponse> weatherData = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        surfSpots = await Http.GetFromJsonAsync<List<SurfSpot>>("api/surfspots");
+        foreach (var spot in surfSpots)
+        {
+            var weather = await FetchWeather(spot.Location);
+            if (weather != null)
+            {
+                weatherData[spot.Location] = weather;
+            }
+        }
+    }
+
+    private async Task<WeatherResponse> FetchWeather(string location)
+    {
+        try
+        {
+            var response = await Http.GetFromJsonAsync<WeatherResponse>($"https://api.weatherapi.com/v1/current.json?q={location}&key=c128a303ed08474c96890114232709");
+            return response;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private WeatherResponse GetWeather(string location)
+    {
+        weatherData.TryGetValue(location, out var weather);
+        return weather;
+    }
+
+    private class WeatherResponse
+    {
+        public Location location { get; set; }
+        public Current current { get; set; }
+
+        public class Location
+        {
+            public string name { get; set; }
+            public string region { get; set; }
+            public string country { get; set; }
+            public double lat { get; set; }
+            public double lon { get; set; }
+            public string tz_id { get; set; }
+            public long localtime_epoch { get; set; }
+            public string localtime { get; set; }
+        }
+
+        public class Current
+        {
+            public double temp_c { get; set; }
+            public double wind_mph { get; set; }
+            public int is_day { get; set; }
+            public Condition condition { get; set; }
+
+            public class Condition
+            {
+                public string text { get; set; }
+                public string icon { get; set; }
+                public int code { get; set; }
+            }
+        }
+    }
+}
+
+                public string icon { get; set; }
+                public int code { get; set; }
+            }
+        }
+    }
+}
