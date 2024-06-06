@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SurfLoggingSweden.Data;
-using SurfLoggingSweden.Shared.Entities;
+using SurfLoggingSweden.Shared.Models;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
 using SurfLoggingSweden.Shared.Entities;
-using SurfLoggingSweden.Shared.Models;
 
 namespace SurfLoggingSweden.Controllers
 {
@@ -16,40 +15,49 @@ namespace SurfLoggingSweden.Controllers
     [ApiController]
     public class SurfSpotController : ControllerBase
     {
-        private readonly DataContext _context;
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IServiceProvider _serviceProvider;
 
-        public SurfSpotController(DataContext context, HttpClient httpClient)
+        public SurfSpotController(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory)
         {
-            _context = context;
-            _httpClient = httpClient;
+            _serviceProvider = serviceProvider;
+            _httpClientFactory = httpClientFactory;
         }
 
         [HttpGet("with-condition")]
         public async Task<ActionResult<List<SurfSpotWithCondition>>> GetSurfSpotsWithCondition()
         {
-            var surfSpots = await _context.SurfSpots.ToListAsync();
-            var tasks = surfSpots.Select(async spot =>
+            using (var scope = _serviceProvider.CreateScope())
             {
-                var condition = await FetchWeatherCondition(spot.Location);
-                return new SurfSpotWithCondition
+                var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+                var surfSpots = await context.SurfSpots.ToListAsync();
+                var tasks = surfSpots.Select(async spot =>
                 {
-                    Id = spot.Id,
-                    Name = spot.Name,
-                    Location = spot.Location,
-                    WindDegree = condition?.current?.wind_degree ?? 0,
-                    WindSpeedMps = condition?.current?.wind_kph / 3.6 ?? 0 // Convert kph to mps
-                };
-            });
-            var surfSpotsWithCondition = await Task.WhenAll(tasks);
-            return Ok(surfSpotsWithCondition);
+                    var condition = await FetchWeatherCondition(spot.Location);
+                    var isSurfable = await CalculateSurfability(spot.Id, condition.current.wind_degree, condition.current.wind_kph / 3.6);
+
+                    return new SurfSpotWithCondition
+                    {
+                        Id = spot.Id,
+                        Name = spot.Name,
+                        Location = spot.Location,
+                        WindDegree = condition?.current?.wind_degree ?? 0,
+                        WindSpeedMps = condition?.current?.wind_kph / 3.6 ?? 0, // Convert kph to mps
+                        Surfable = isSurfable
+                    };
+                });
+                var surfSpotsWithCondition = await Task.WhenAll(tasks);
+                return Ok(surfSpotsWithCondition);
+            }
         }
 
         private async Task<WeatherCondition> FetchWeatherCondition(string location)
         {
             try
             {
-                var response = await _httpClient.GetStringAsync($"https://api.weatherapi.com/v1/current.json?q={location}&key=c128a303ed08474c96890114232709");
+                var httpClient = _httpClientFactory.CreateClient();
+                var response = await httpClient.GetStringAsync($"https://api.weatherapi.com/v1/current.json?q={location}&key=c128a303ed08474c96890114232709");
                 return JsonSerializer.Deserialize<WeatherCondition>(response);
             }
             catch
@@ -58,32 +66,66 @@ namespace SurfLoggingSweden.Controllers
             }
         }
 
+        private async Task<bool> CalculateSurfability(int surfSpotId, int currentWindDegree, double currentWindSpeedMps)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+                var highRatingSessions = await context.SurfSessions
+                    .Where(session => session.SurfSpotId == surfSpotId && session.Rating >= 4)
+                    .ToListAsync();
+
+                if (!highRatingSessions.Any())
+                    return false;
+
+                var matchingSessions = highRatingSessions
+                    .Where(session =>
+                        Math.Abs(session.WindDegree - currentWindDegree) <= 30 &&
+                        Math.Abs(session.WindPower - currentWindSpeedMps) <= 2);
+
+                return matchingSessions.Any();
+            }
+        }
+
         [HttpGet]
         public async Task<ActionResult<List<SurfSpot>>> GetSurfSpotsAsync()
         {
-            return await _context.SurfSpots.ToListAsync();
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+                return await context.SurfSpots.ToListAsync();
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<SurfSpot>> GetSurfSpot(int id)
         {
-            var surfSpot = await _context.SurfSpots.FindAsync(id);
-
-            if (surfSpot == null)
+            using (var scope = _serviceProvider.CreateScope())
             {
-                return NotFound();
-            }
+                var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+                var surfSpot = await context.SurfSpots.FindAsync(id);
 
-            return surfSpot;
+                if (surfSpot == null)
+                {
+                    return NotFound();
+                }
+
+                return surfSpot;
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult<SurfSpot>> PostSurfSpot(SurfSpot surfSpot)
         {
-            _context.SurfSpots.Add(surfSpot);
-            await _context.SaveChangesAsync();
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+                context.SurfSpots.Add(surfSpot);
+                await context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetSurfSpot), new { id = surfSpot.Id }, surfSpot);
+                return CreatedAtAction(nameof(GetSurfSpot), new { id = surfSpot.Id }, surfSpot);
+            }
         }
 
         [HttpPut("{id}")]
@@ -94,45 +136,53 @@ namespace SurfLoggingSweden.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(surfSpot).State = EntityState.Modified;
-
-            try
+            using (var scope = _serviceProvider.CreateScope())
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!SurfSpotExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+                context.Entry(surfSpot).State = EntityState.Modified;
 
-            return NoContent();
+                try
+                {
+                    await context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!SurfSpotExists(context, id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return NoContent();
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSurfSpot(int id)
         {
-            var surfSpot = await _context.SurfSpots.FindAsync(id);
-            if (surfSpot == null)
+            using (var scope = _serviceProvider.CreateScope())
             {
-                return NotFound();
+                var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+                var surfSpot = await context.SurfSpots.FindAsync(id);
+                if (surfSpot == null)
+                {
+                    return NotFound();
+                }
+
+                context.SurfSpots.Remove(surfSpot);
+                await context.SaveChangesAsync();
+
+                return NoContent();
             }
-
-            _context.SurfSpots.Remove(surfSpot);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
-        private bool SurfSpotExists(int id)
+        private bool SurfSpotExists(DataContext context, int id)
         {
-            return _context.SurfSpots.Any(e => e.Id == id);
+            return context.SurfSpots.Any(e => e.Id == id);
         }
 
         public class WeatherCondition

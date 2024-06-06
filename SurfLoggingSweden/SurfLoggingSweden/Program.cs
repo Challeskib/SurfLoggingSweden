@@ -1,8 +1,6 @@
-using SurfLoggingSweden.Client.Pages;
+using Microsoft.EntityFrameworkCore;
 using SurfLoggingSweden.Components;
 using SurfLoggingSweden.Data;
-using Microsoft.EntityFrameworkCore;
-using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,14 +9,14 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddControllers();
+builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<DataContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<DataContext>(); // Ensure DbContext is scoped
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
-
-// Register HttpClient service
-builder.Services.AddHttpClient();
 
 builder.Services.AddCors(options =>
 {

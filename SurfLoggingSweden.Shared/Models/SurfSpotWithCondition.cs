@@ -7,5 +7,6 @@
         public string Location { get; set; }
         public int WindDegree { get; set; }
         public double WindSpeedMps { get; set; }
+        public bool Surfable { get; set; }
     }
 }
