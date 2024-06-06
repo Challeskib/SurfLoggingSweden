@@ -2,6 +2,7 @@ using SurfLoggingSweden.Client.Pages;
 using SurfLoggingSweden.Components;
 using SurfLoggingSweden.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,8 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectio
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
+// Register HttpClient service
+builder.Services.AddHttpClient();
 
 builder.Services.AddCors(options =>
 {
