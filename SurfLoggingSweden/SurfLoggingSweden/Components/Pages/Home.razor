@@ -1,7 +1,93 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+@inject NavigationManager Navigation
 
-<h1>Hello, world!</h1>
+<PageTitle>SurfLoggingSweden - Home</PageTitle>
 
-Welcome to your new app.
+<div class="about">
+    <h2>About SurfLoggingSweden</h2>
+    <p>SurfLoggingSweden helps surfers track their favorite surf spots with real-time weather conditions. Log your surf sessions, rate them, and get personalized surfability predictions based on your past experiences.</p>
+    <div class="features">
+        <div class="feature">
+            <i class="bi bi-geo-alt-fill"></i>
+            <h3>Track Surf Spots</h3>
+            <p>View real-time conditions of your favorite surf spots and log your surf sessions effortlessly.</p>
+        </div>
+        <div class="feature">
+            <i class="bi bi-cloud-sun-fill"></i>
+            <h3>Live Weather Updates</h3>
+            <p>Get up-to-date weather conditions including wind speed, direction, and surfability ratings.</p>
+        </div>
+        <div class="feature">
+            <i class="bi bi-bar-chart-fill"></i>
+            <h3>Analyze Your Sessions</h3>
+            <p>Review and analyze your past surf sessions to improve your performance and find the best spots.</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        background: linear-gradient(to bottom, #0072ff, #00c6ff);
+        color: #fff;
+    }
+
+    .hero {
+        background: url('/images/surfing-background.jpg') no-repeat center center/cover;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: white;
+    }
+
+    .hero-content {
+        background: rgba(0, 0, 0, 0.5);
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .explore-button {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+        .explore-button:hover {
+            background: #218838;
+        }
+
+    .about {
+        padding: 40px;
+        background: #0072ff;
+        text-align: center;
+    }
+
+    .features {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+    .feature {
+        flex: 1;
+        min-width: 200px;
+        margin: 20px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        text-align: center;
+    }
+
+        .feature i {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+</style>

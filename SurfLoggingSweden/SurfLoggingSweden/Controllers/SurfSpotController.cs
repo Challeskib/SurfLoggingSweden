@@ -73,7 +73,7 @@ namespace SurfLoggingSweden.Controllers
                 var context = scope.ServiceProvider.GetRequiredService<DataContext>();
 
                 var highRatingSessions = await context.SurfSessions
-                    .Where(session => session.SurfSpotId == surfSpotId && session.Rating >= 4)
+                    .Where(session => session.SurfSpotId == surfSpotId && session.Rating >= 3)
                     .ToListAsync();
 
                 if (!highRatingSessions.Any())
@@ -81,8 +81,8 @@ namespace SurfLoggingSweden.Controllers
 
                 var matchingSessions = highRatingSessions
                     .Where(session =>
-                        Math.Abs(session.WindDegree - currentWindDegree) <= 30 &&
-                        Math.Abs(session.WindPower - currentWindSpeedMps) <= 2);
+                        Math.Abs(session.WindDegree - currentWindDegree) <= 45 &&
+                        Math.Abs(session.WindPower - currentWindSpeedMps) <= 3);
 
                 return matchingSessions.Any();
             }

@@ -1,62 +1,65 @@
 ﻿@page "/currentweather"
 @inject HttpClient Http
-
 @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 
 <h3>Surf Spot Weather Overview</h3>
 
-@if (isLoading)
+@if (surfSpotsWithCondition == null || surfSpotsWithCondition.Count == 0)
 {
     <p><em>Loading surf spots...</em></p>
 }
-else if (surfSpotsWithCondition == null || surfSpotsWithCondition.Count == 0)
-{
-    <p><em>No surf spots available.</em></p>
-}
 else
 {
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Location</th>
-                <th>Wind Degree</th>
-                <th>Wind Speed (m/s)</th>
-                <th>Surfable</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var spot in surfSpotsWithCondition)
-            {
-                <tr>
-                    <td>@spot.Name</td>
-                    <td>@spot.Location</td>
-                    <td>@spot.WindDegree</td>
-                    <td>@spot.WindSpeedMps</td>
-                    <td>@(spot.Surfable ? "Yes" : "No")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="grid-container">
+        @foreach (var spot in surfSpotsWithCondition)
+        {
+            <div class="grid-item @(spot.Surfable ? "surfable" : "notsurfable")">
+                <h4>@spot.Name</h4>
+                <p>@spot.Location</p>
+                <p>Wind Degree: @spot.WindDegree</p>
+                <p>Wind Speed: @spot.WindSpeedMps m/s</p>
+                <p>@(spot.Surfable ? "Surfable" : "Not Surfable")</p>
+            </div>
+        }
+    </div>
 }
 
+<style>
+    body {
+        background: linear-gradient(to bottom, #00c6ff, #0072ff);
+        background-attachment: fixed;
+        color: white;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .grid-item {
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .surfable {
+        background: linear-gradient(to bottom right, #28a745, #218838);
+    }
+
+    .notsurfable {
+        background: linear-gradient(to bottom right, #dc3545, #c82333);
+    }
+</style>
+
 @code {
-    private List<SurfLoggingSweden.Shared.Models.SurfSpotWithCondition> surfSpotsWithCondition;
-    private bool isLoading = true;
+    private List<SurfSpotWithCondition> surfSpotsWithCondition;
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            surfSpotsWithCondition = await Http.GetFromJsonAsync<List<SurfLoggingSweden.Shared.Models.SurfSpotWithCondition>>("api/surfspots/with-condition");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error fetching surf spots: {ex.Message}");
-        }
-        finally
-        {
-            isLoading = false;
-        }
+        surfSpotsWithCondition = await Http.GetFromJsonAsync<List<SurfSpotWithCondition>>("api/surfspots/with-condition");
     }
 }
