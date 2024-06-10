@@ -17,11 +17,14 @@ namespace SurfLoggingSweden.Controllers
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IServiceProvider _serviceProvider;
+        private readonly string _weatherApiKey;
 
-        public SurfSpotController(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory)
+
+        public SurfSpotController(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _serviceProvider = serviceProvider;
             _httpClientFactory = httpClientFactory;
+            _weatherApiKey = configuration["WeatherApi:ApiKey"];
         }
 
         [HttpGet("with-condition")]
@@ -57,7 +60,8 @@ namespace SurfLoggingSweden.Controllers
             try
             {
                 var httpClient = _httpClientFactory.CreateClient();
-                var response = await httpClient.GetStringAsync($"https://api.weatherapi.com/v1/current.json?q={location}&key=c128a303ed08474c96890114232709");
+                var url = $"https://api.weatherapi.com/v1/current.json?q={location}&key={_weatherApiKey}";
+                var response = await httpClient.GetStringAsync(url);
                 return JsonSerializer.Deserialize<WeatherCondition>(response);
             }
             catch
