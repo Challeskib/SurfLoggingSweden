@@ -24,8 +24,35 @@ namespace SurfLoggingSweden.Controllers
         [HttpGet]
         public async Task<ActionResult<List<SurfSession>>> GetSurfSessionsAsync()
         {
-            return await _context.SurfSessions.ToListAsync();
+            var result = await _context.SurfSessions
+                .ToListAsync();
+
+            return result;
         }
+
+        [HttpGet("surfsessionsdto")]
+        public async Task<ActionResult<List<SurfSessionDto>>> GetSurfSessionsDtoAsync()
+        {
+            var sessions = await _context.SurfSessions
+                .Include(s => s.SurfSpot)
+                .ToListAsync();
+
+            var sessionDtos = sessions.Select(s => new SurfSessionDto
+            {
+                Id = s.Id,
+                SurfSpotId = s.SurfSpotId,
+                SurfSpotName = s.SurfSpot?.Name,
+                WindDegree = s.WindDegree,
+                Rating = s.Rating,
+                WindPower = s.WindPower,
+                Start = s.Start,
+                End = s.End
+            }).ToList();
+
+            return Ok(sessionDtos);
+        }
+
+
 
         [HttpGet("spotsessioncounts")]
         public async Task<ActionResult<List<SurfSpotSessionCount>>> GetSurfSpotSessionCounts()

@@ -19,6 +19,7 @@ else
     <table class="table">
         <thead>
             <tr>
+                <th>Surf Spot</th>
                 <th>Date</th>
                 <th>Wind Degree</th>
                 <th>Rating</th>
@@ -30,6 +31,7 @@ else
             @foreach (var surfSession in surfSessions)
             {
                 <tr>
+                    <td>@surfSession.SurfSpotName</td> <!-- Display the surf spot name -->
                     <td>
                         @if (editIndex == surfSessions.IndexOf(surfSession))
                         {
@@ -89,13 +91,21 @@ else
 }
 
 @code {
-    private List<SurfSession> surfSessions;
+    private List<SurfSessionDto> surfSessions;
     private int editIndex = -1; // Index of the session being edited
 
     protected override async Task OnInitializedAsync()
     {
-        await Task.Delay(500);
-        surfSessions = await Http.GetFromJsonAsync<List<SurfSession>>("api/surfsessions");
+        try
+        {
+            await Task.Delay(500);
+            surfSessions = await Http.GetFromJsonAsync<List<SurfSessionDto>>("api/surfsessions/surfsessionsdto");
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading surf sessions: {ex.Message}");
+        }
     }
 
     private void NavigateToAddSession()
@@ -113,16 +123,37 @@ else
         editIndex = -1;
     }
 
-    private async Task SaveEdit(SurfSession surfSession)
+    private async Task SaveEdit(SurfSessionDto surfSession)
     {
-        await Http.PutAsJsonAsync($"api/surfsessions/{surfSession.Id}", surfSession);
-        editIndex = -1;
+        try
+        {
+            await Http.PutAsJsonAsync($"api/surfsessions/{surfSession.Id}", surfSession);
+            editIndex = -1;
+            await ReloadSessions();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving surf session: {ex.Message}");
+        }
     }
 
     private async Task DeleteSession(int id)
     {
-        await Http.DeleteAsync($"api/surfsessions/{id}");
-        surfSessions = await Http.GetFromJsonAsync<List<SurfSession>>("api/surfsessions");
+        try
+        {
+            await Http.DeleteAsync($"api/surfsessions/{id}");
+            await ReloadSessions();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting surf session: {ex.Message}");
+        }
+    }
+
+    private async Task ReloadSessions()
+    {
+        surfSessions = await Http.GetFromJsonAsync<List<SurfSessionDto>>("api/surfsessions/surfsessionsdto");
+        StateHasChanged(); // Force the component to re-render
     }
 
     private string GetRatingColor(int rating)

@@ -2,7 +2,7 @@
 @inject HttpClient Http
 @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 
-<h3>Surf Spot Weather Overview</h3>
+<h3 class="text-center my-4">Surf Spot Weather Overview</h3>
 
 @if (surfSpotsWithCondition == null || surfSpotsWithCondition.Count == 0)
 {
@@ -14,11 +14,15 @@ else
         @foreach (var spot in surfSpotsWithCondition)
         {
             <div class="grid-item @(spot.Surfable ? "surfable" : "notsurfable")">
-                <h4>@spot.Name</h4>
-                <p>@spot.Location</p>
-                <p>Wind Degree: @spot.WindDegree</p>
-                <p>Wind Speed: @spot.WindSpeedMps m/s</p>
-                <p>@(spot.Surfable ? "Surfable" : "Not Surfable")</p>
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">@spot.Name</h4>
+                        <h6 class="card-subtitle mb-2 text-muted">@spot.Location</h6>
+                        <p class="card-text">Wind Degree: @spot.WindDegree</p>
+                        <p class="card-text">Wind Speed: @spot.WindSpeedMps.ToString("F2") m/s</p>
+                        <p class="card-text surf-status">@(spot.Surfable ? "Surfable" : "Not Surfable")</p>
+                    </div>
+                </div>
             </div>
         }
     </div>
@@ -33,25 +37,58 @@ else
 
     .grid-container {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 20px;
         padding: 20px;
     }
 
     .grid-item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.2s, background-color 0.5s, box-shadow 0.5s;
+        cursor: pointer;
+    }
+
+        .grid-item:hover {
+            transform: translateY(-5px);
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+        }
+
+    .card {
+        width: 100%;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.2s;
+    }
+
+    .card-body {
         padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        color: white;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        color: #333;
     }
 
-    .surfable {
+        .card-body:hover {
+            transform: scale(1.02);
+        }
+
+    .surfable .card-body {
         background: linear-gradient(to bottom right, #28a745, #218838);
+        color: white;
     }
 
-    .notsurfable {
+    .notsurfable .card-body {
         background: linear-gradient(to bottom right, #dc3545, #c82333);
+        color: white;
+    }
+
+    .surf-status {
+        font-weight: bold;
+        font-size: 1.2em;
     }
 </style>
 
